@@ -82,44 +82,6 @@ def get_app_name(bundle_id):
         return name.capitalize()
     return bundle_id
 
-def send_telegram_notification(token, chat_id, app_name, title, subtitle, body):
-    def escape_html(text):
-        if not text:
-            return ""
-        return text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
-
-    app_name_esc = escape_html(app_name)
-    title_esc = escape_html(title)
-    subtitle_esc = escape_html(subtitle)
-    body_esc = escape_html(body)
-
-    message_lines = [f"<b>🔔 Mac 通知 ({app_name_esc})</b>"]
-    if title_esc:
-        message_lines.append(f"<b>标题:</b> {title_esc}")
-    if subtitle_esc:
-        message_lines.append(f"<b>副标题:</b> {subtitle_esc}")
-    if body_esc:
-        message_lines.append(f"<b>内容:</b> {body_esc}")
-
-    message = "\n".join(message_lines)
-    url = f"https://api.telegram.org/bot{token}/sendMessage"
-    payload = {
-        "chat_id": chat_id,
-        "text": message,
-        "parse_mode": "HTML"
-    }
-
-    data = json.dumps(payload).encode('utf-8')
-    req = urllib.request.Request(url, data=data, headers={'Content-Type': 'application/json'})
-
-    try:
-        with urllib.request.urlopen(req, timeout=30) as response:
-            res = json.loads(response.read().decode('utf-8'))
-            return res.get("ok", False)
-    except Exception as e:
-        print(f"Telegram sending failed: {e}")
-        return False
-
 def send_email_notification(smtp_server, smtp_port, sender, password, receiver, app_name, title, subtitle, body):
     # Construct subject with actual app name, title, and notification content
     subject_parts = []
@@ -159,6 +121,44 @@ def send_email_notification(smtp_server, smtp_port, sender, password, receiver, 
         return True
     except Exception as e:
         print(f"Email sending failed: {e}")
+        return False
+
+def send_telegram_notification(token, chat_id, app_name, title, subtitle, body):
+    def escape_html(text):
+        if not text:
+            return ""
+        return text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+
+    app_name_esc = escape_html(app_name)
+    title_esc = escape_html(title)
+    subtitle_esc = escape_html(subtitle)
+    body_esc = escape_html(body)
+
+    message_lines = [f"<b>🔔 Mac 通知 ({app_name_esc})</b>"]
+    if title_esc:
+        message_lines.append(f"<b>标题:</b> {title_esc}")
+    if subtitle_esc:
+        message_lines.append(f"<b>副标题:</b> {subtitle_esc}")
+    if body_esc:
+        message_lines.append(f"<b>内容:</b> {body_esc}")
+
+    message = "\n".join(message_lines)
+    url = f"https://api.telegram.org/bot{token}/sendMessage"
+    payload = {
+        "chat_id": chat_id,
+        "text": message,
+        "parse_mode": "HTML"
+    }
+
+    data = json.dumps(payload).encode('utf-8')
+    req = urllib.request.Request(url, data=data, headers={'Content-Type': 'application/json'})
+
+    try:
+        with urllib.request.urlopen(req, timeout=30) as response:
+            res = json.loads(response.read().decode('utf-8'))
+            return res.get("ok", False)
+    except Exception as e:
+        print(f"Telegram sending failed: {e}")
         return False
 
 def get_last_processed_id(cursor):
@@ -232,7 +232,7 @@ def main():
             config = load_config() or {}
             enabled_channels = config.get("enabled_channels", [])
             if not enabled_channels:
-                enabled_channels = [config.get("push_channel", "telegram")]
+                enabled_channels = [config.get("push_channel", "email")]
 
             poll_interval = config.get("poll_interval_seconds", 2.0)
             exclude_apps = config.get("exclude_apps", [])
@@ -241,12 +241,7 @@ def main():
             # Pre-validate enabled channels dynamically
             validated_channels = []
             for chan in enabled_channels:
-                if chan == "telegram":
-                    bot_token = config.get("telegram_bot_token")
-                    chat_id = config.get("telegram_chat_id")
-                    if bot_token and chat_id and bot_token != "YOUR_BOT_TOKEN" and chat_id != "YOUR_CHAT_ID":
-                        validated_channels.append(("telegram", (bot_token, chat_id)))
-                elif chan == "email":
+                if chan == "email":
                     server = config.get("email_smtp_server")
                     port = config.get("email_smtp_port", 465)
                     sender = config.get("email_sender")
@@ -254,6 +249,11 @@ def main():
                     receiver = config.get("email_receiver")
                     if server and sender and password and receiver and "YOUR_" not in sender and "YOUR_" not in password:
                         validated_channels.append(("email", (server, port, sender, password, receiver)))
+                elif chan == "telegram":
+                    bot_token = config.get("telegram_bot_token")
+                    chat_id = config.get("telegram_chat_id")
+                    if bot_token and chat_id and bot_token != "YOUR_BOT_TOKEN" and chat_id != "YOUR_CHAT_ID":
+                        validated_channels.append(("telegram", (bot_token, chat_id)))
 
             try:
                 conn.rollback()  # Reset transaction to see newly committed records in WAL mode
@@ -307,10 +307,10 @@ def main():
                 # Forward notification to all validated channels
                 for chan_type, args in validated_channels:
                     success = False
-                    if chan_type == "telegram":
-                        success = send_telegram_notification(args[0], args[1], app_name, title, subtitle, body)
-                    elif chan_type == "email":
+                    if chan_type == "email":
                         success = send_email_notification(args[0], args[1], args[2], args[3], args[4], app_name, title, subtitle, body)
+                    elif chan_type == "telegram":
+                        success = send_telegram_notification(args[0], args[1], app_name, title, subtitle, body)
 
                     if not success:
                         print(f"Warning: Failed to forward notification {rec_id} via {chan_type}.")

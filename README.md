@@ -1,16 +1,16 @@
 # MacPush
 
-> 轻量级 macOS 通知转发器 — 将 Mac 上的通知实时推送到 Telegram 或邮箱
+> 轻量级 macOS 通知转发器 — 将 Mac 上的通知实时推送到邮箱或 Telegram
 
-MacPush 是一个驻留在 macOS 菜单栏的小工具，它会实时监测系统通知中心数据库，将新通知通过 **Telegram Bot** 或 **电子邮件 (SMTP)** 转发到你的手机或其他设备。
+MacPush 是一个驻留在 macOS 菜单栏的小工具，它会实时监测系统通知中心数据库，将新通知通过 **电子邮件 (SMTP)** 或 **Telegram Bot** 转发到你的手机或其他设备。
 
 **零第三方依赖**，纯 Python 标准库 + 原生 Objective-C 菜单栏 App，轻量、安全、开箱即用。
 
 ## 功能特性
 
 - 🔔 **实时监测** — 轮询 macOS 通知中心 SQLite 数据库，新通知秒级到达
-- ✈️ **Telegram 推送** — 通过 Telegram Bot API 推送通知
 - ✉️ **邮件推送** — 通过 SMTP 协议发送通知邮件
+- ✈️ **Telegram 推送** — 通过 Telegram Bot API 推送通知
 - 🖥️ **菜单栏控制** — 原生 macOS 菜单栏 App，一键启停、查看状态
 - ⚙️ **Web 配置面板** — 内置 WebKit 设置界面，可视化配置推送渠道
 - 🔇 **智能免打扰** — 检测到用户正在使用 Mac 时自动暂停转发
@@ -55,7 +55,7 @@ cp -R MacPush.app /Applications/
 ### 4. 配置推送渠道
 
 1. 从菜单栏点击 🔔 图标 → 选择「设置」
-2. 在弹出的 Web 配置面板中，启用并填写 Telegram Bot Token / Chat ID，或邮箱 SMTP 信息
+2. 在弹出的 Web 配置面板中，启用并填写邮箱 SMTP 信息，或 Telegram Bot Token / Chat ID
 3. 点击「测试连接」验证配置
 4. 点击「保存全部配置」
 
@@ -65,12 +65,6 @@ cp -R MacPush.app /Applications/
 
 ## 推送渠道配置指南
 
-### Telegram Bot
-
-1. 在 Telegram 中搜索 `@BotFather`，发送 `/newbot` 创建机器人，获得 **Bot Token**
-2. 搜索 `@userinfobot`，发送任意消息获取你的 **Chat ID**
-3. 确保你已与新创建的机器人发起过对话（点击 Start）
-
 ### 邮件 (SMTP)
 
 以 QQ 邮箱为例：
@@ -79,6 +73,12 @@ cp -R MacPush.app /Applications/
 2. **发件人邮箱**：你的完整 QQ 邮箱地址
 3. **SMTP 授权码**：在 QQ 邮箱设置 → 账户 → POP3/SMTP 服务中获取 16 位授权码（非邮箱登录密码）
 4. **收件人邮箱**：接收通知的邮箱地址
+
+### Telegram Bot
+
+1. 在 Telegram 中搜索 `@BotFather`，发送 `/newbot` 创建机器人，获得 **Bot Token**
+2. 搜索 `@userinfobot`，发送任意消息获取你的 **Chat ID**
+3. 确保你已与新创建的机器人发起过对话（点击 Start）
 
 ## 项目结构
 
@@ -106,7 +106,7 @@ MacPush/
 2. **数据解析**：数据库 `record` 表的 `data` 列是二进制属性列表 (bplist)，通过 Python `plistlib` 解析出标题、副标题、正文
 3. **防重机制**：处理完通知后，将最新 `rec_id` 写入 `~/.last_id`，重启时从该 ID 继续
 4. **智能免打扰**：通过 `ioreg` 读取 HIDIdleTime，判断用户是否活跃
-5. **推送发送**：Telegram 使用 `urllib.request` 调用 Bot API；邮件使用 `smtplib` SSL 连接
+5. **推送发送**：邮件使用 `smtplib` SSL 连接；Telegram 使用 `urllib.request` 调用 Bot API
 
 ## 开机自启动
 

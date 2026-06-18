@@ -11,15 +11,15 @@ def load_config():
     if not os.path.exists(CONFIG_FILE):
         # Create a default configuration structure
         default_config = {
-            "enabled_channels": ["telegram"],
-            "push_channel": "telegram",
-            "telegram_bot_token": "YOUR_BOT_TOKEN",
-            "telegram_chat_id": "YOUR_CHAT_ID",
+            "enabled_channels": ["email"],
+            "push_channel": "email",
             "email_smtp_server": "smtp.qq.com",
             "email_smtp_port": 465,
             "email_sender": "YOUR_SENDER_EMAIL@qq.com",
             "email_password": "YOUR_SMTP_AUTHORIZATION_CODE",
             "email_receiver": "YOUR_RECEIVER_EMAIL@qq.com",
+            "telegram_bot_token": "YOUR_BOT_TOKEN",
+            "telegram_chat_id": "YOUR_CHAT_ID",
             "poll_interval_seconds": 2.0,
             "exclude_apps": [
                 "com.apple.controlcenter",
@@ -34,7 +34,7 @@ def load_config():
             config = json.load(f)
             # Ensure enabled_channels exists
             if "enabled_channels" not in config:
-                config["enabled_channels"] = [config.get("push_channel", "telegram")]
+                config["enabled_channels"] = [config.get("push_channel", "email")]
             return config
     except Exception:
         return {}
@@ -50,14 +50,14 @@ def get_info():
     config = load_config()
     enabled_channels = config.get("enabled_channels", [])
     if not enabled_channels:
-        enabled_channels = [config.get("push_channel", "telegram")]
+        enabled_channels = [config.get("push_channel", "email")]
 
     names = []
     for c in enabled_channels:
-        if c == "telegram":
-            names.append("Telegram")
-        elif c == "email":
+        if c == "email":
             names.append("邮箱")
+        elif c == "telegram":
+            names.append("Telegram")
 
     info_lines = [f"● 启用的渠道: {', '.join(names)}"]
     info_lines.append(f"● 轮询速度: {config.get('poll_interval_seconds', 2.0)} 秒")
@@ -67,23 +67,23 @@ def check_config():
     config = load_config()
     enabled_channels = config.get("enabled_channels", [])
     if not enabled_channels:
-        enabled_channels = [config.get("push_channel", "telegram")]
+        enabled_channels = [config.get("push_channel", "email")]
 
     if not enabled_channels:
         return "false"
 
     for channel in enabled_channels:
-        if channel == "telegram":
-            token = config.get("telegram_bot_token", "")
-            chat_id = config.get("telegram_chat_id", "")
-            if not token or not chat_id or "YOUR_" in token or "YOUR_" in chat_id:
-                return "false"
-        elif channel == "email":
+        if channel == "email":
             server = config.get("email_smtp_server", "")
             sender = config.get("email_sender", "")
             password = config.get("email_password", "")
             receiver = config.get("email_receiver", "")
             if not server or not sender or not password or not receiver or "YOUR_" in sender or "YOUR_" in password:
+                return "false"
+        elif channel == "telegram":
+            token = config.get("telegram_bot_token", "")
+            chat_id = config.get("telegram_chat_id", "")
+            if not token or not chat_id or "YOUR_" in token or "YOUR_" in chat_id:
                 return "false"
 
     return "true"

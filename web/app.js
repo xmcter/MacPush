@@ -24,7 +24,7 @@ function showToast(message, type = 'info') {
 
 // Add state update visual styling when toggle switches change
 function setupToggleListeners() {
-    ['telegram', 'email'].forEach(channel => {
+    ['email', 'telegram'].forEach(channel => {
         const toggle = document.getElementById(`toggle-${channel}`);
         const card = document.getElementById(`card-${channel}`);
         
@@ -82,8 +82,8 @@ async function loadSettings() {
         const config = await response.json();
         
         // Setup channels status
-        const enabled = config.enabled_channels || [config.push_channel || 'telegram'];
-        ['telegram', 'email'].forEach(channel => {
+        const enabled = config.enabled_channels || [config.push_channel || 'email'];
+        ['email', 'telegram'].forEach(channel => {
             const toggle = document.getElementById(`toggle-${channel}`);
             const card = document.getElementById(`card-${channel}`);
             const isEnabled = enabled.includes(channel);
@@ -97,15 +97,15 @@ async function loadSettings() {
         });
         
         // Load credentials fields
-        document.getElementById('tg-token').value = config.telegram_bot_token || '';
-        document.getElementById('tg-chatid').value = config.telegram_chat_id || '';
-        
         // Email SMTP fields
         document.getElementById('email-server').value = config.email_smtp_server || 'smtp.qq.com';
         document.getElementById('email-port').value = config.email_smtp_port || 465;
         document.getElementById('email-sender').value = config.email_sender || '';
         document.getElementById('email-password').value = config.email_password || '';
         document.getElementById('email-receiver').value = config.email_receiver || '';
+
+        document.getElementById('tg-token').value = config.telegram_bot_token || '';
+        document.getElementById('tg-chatid').value = config.telegram_chat_id || '';
         
         // Globals
         document.getElementById('toggle-autolaunch').checked = config.auto_launch || false;
@@ -122,8 +122,8 @@ async function loadSettings() {
 // Save all configurations
 async function saveSettings() {
     const enabled_channels = [];
-    if (document.getElementById('toggle-telegram').checked) enabled_channels.push('telegram');
     if (document.getElementById('toggle-email').checked) enabled_channels.push('email');
+    if (document.getElementById('toggle-telegram').checked) enabled_channels.push('telegram');
     
     if (enabled_channels.length === 0) {
         showToast('请至少启用一个推送渠道！', 'error');
@@ -136,13 +136,13 @@ async function saveSettings() {
     const payload = {
         enabled_channels,
         push_channel: enabled_channels[0], // backward compatibility
-        telegram_bot_token: document.getElementById('tg-token').value.trim(),
-        telegram_chat_id: document.getElementById('tg-chatid').value.trim(),
         email_smtp_server: document.getElementById('email-server').value.trim(),
         email_smtp_port: parseInt(document.getElementById('email-port').value) || 465,
         email_sender: document.getElementById('email-sender').value.trim(),
         email_password: document.getElementById('email-password').value.trim(),
         email_receiver: document.getElementById('email-receiver').value.trim(),
+        telegram_bot_token: document.getElementById('tg-token').value.trim(),
+        telegram_chat_id: document.getElementById('tg-chatid').value.trim(),
         auto_launch: document.getElementById('toggle-autolaunch').checked,
         mute_when_active: document.getElementById('toggle-mute-active').checked,
         poll_interval_seconds: parseFloat(document.getElementById('poll-interval').value) || 2.0,
@@ -171,13 +171,7 @@ async function saveSettings() {
 // Trigger single channel connectivity test
 async function testChannel(channel) {
     let payload = {};
-    if (channel === 'telegram') {
-        payload = {
-            channel,
-            telegram_bot_token: document.getElementById('tg-token').value.trim(),
-            telegram_chat_id: document.getElementById('tg-chatid').value.trim()
-        };
-    } else if (channel === 'email') {
+    if (channel === 'email') {
         payload = {
             channel,
             email_smtp_server: document.getElementById('email-server').value.trim(),
@@ -185,6 +179,12 @@ async function testChannel(channel) {
             email_sender: document.getElementById('email-sender').value.trim(),
             email_password: document.getElementById('email-password').value.trim(),
             email_receiver: document.getElementById('email-receiver').value.trim()
+        };
+    } else if (channel === 'telegram') {
+        payload = {
+            channel,
+            telegram_bot_token: document.getElementById('tg-token').value.trim(),
+            telegram_chat_id: document.getElementById('tg-chatid').value.trim()
         };
     }
     

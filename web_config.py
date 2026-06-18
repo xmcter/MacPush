@@ -8,7 +8,7 @@ from http.server import SimpleHTTPRequestHandler, HTTPServer
 
 # Import the existing forwarder notification functions for testing connectivity
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-from forwarder import send_telegram_notification, send_email_notification
+from forwarder import send_email_notification, send_telegram_notification
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 # The web folder remains static inside App Resources bundle
@@ -130,17 +130,17 @@ class ConfigServerHandler(SimpleHTTPRequestHandler):
             test_body = "恭喜，你的推送渠道配置连接测试成功！"
 
             try:
-                if channel == "telegram":
-                    token = req_data.get("telegram_bot_token")
-                    chat_id = req_data.get("telegram_chat_id")
-                    success = send_telegram_notification(token, chat_id, test_app, test_title, test_subtitle, test_body)
-                elif channel == "email":
+                if channel == "email":
                     server = req_data.get("email_smtp_server")
                     port = int(req_data.get("email_smtp_port", 465))
                     sender = req_data.get("email_sender")
                     password = req_data.get("email_password")
                     receiver = req_data.get("email_receiver")
                     success = send_email_notification(server, port, sender, password, receiver, test_app, test_title, test_subtitle, test_body)
+                elif channel == "telegram":
+                    token = req_data.get("telegram_bot_token")
+                    chat_id = req_data.get("telegram_chat_id")
+                    success = send_telegram_notification(token, chat_id, test_app, test_title, test_subtitle, test_body)
                 else:
                     error_msg = f"Unknown channel: {channel}"
             except Exception as e:

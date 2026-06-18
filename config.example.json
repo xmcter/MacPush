@@ -1,13 +1,13 @@
 {
-  "enabled_channels": ["telegram"],
-  "push_channel": "telegram",
-  "telegram_bot_token": "YOUR_BOT_TOKEN",
-  "telegram_chat_id": "YOUR_CHAT_ID",
+  "enabled_channels": ["email"],
+  "push_channel": "email",
   "email_smtp_server": "smtp.qq.com",
   "email_smtp_port": 465,
   "email_sender": "YOUR_SENDER_EMAIL@qq.com",
   "email_password": "YOUR_SMTP_AUTHORIZATION_CODE",
   "email_receiver": "YOUR_RECEIVER_EMAIL@qq.com",
+  "telegram_bot_token": "YOUR_BOT_TOKEN",
+  "telegram_chat_id": "YOUR_CHAT_ID",
   "mute_when_active": true,
   "poll_interval_seconds": 2.0,
   "exclude_apps": [
