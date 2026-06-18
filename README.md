@@ -30,36 +30,50 @@ MacPush 是一个驻留在 macOS 菜单栏的小工具，它会实时监测系�
 - Python 3（系统自带即可，无需额外安装）
 - Xcode Command Line Tools（用于编译 Objective-C 菜单栏 App）
 
-### 1. 克隆仓库
+### 1. 下载安装
+
+#### 方式一：下载 DMG 安装包（推荐）
+
+1. 前往 [Releases 页面](https://github.com/xmcter/MacPush/releases) 下载最新的 `MacPush.dmg`
+2. 双击打开 DMG，将 MacPush.app 拖入 Applications 文件夹快捷方式
+3. 打开「应用程序」文件夹，启动 MacPush
+
+> ⚠️ **首次打开提示「已损坏」或「无法验证开发者」怎么办？**
+>
+> MacPush 是开源项目，没有购买 Apple 开发者证书，所以 macOS Gatekeeper 会拦截。请执行以下任一方法解除：
+>
+> **方法一（推荐）**：在终端中运行：
+> ```bash
+> sudo xattr -cr /Applications/MacPush.app
+> ```
+>
+> **方法二**：右键点击 MacPush.app → 选择「打开」→ 在弹窗中再次点击「打开」
+
+#### 方式二：从源码构建
 
 ```bash
-git clone https://github.com/your-username/MacPush.git
+git clone https://github.com/xmcter/MacPush.git
 cd MacPush
-```
-
-### 2. 授予完全磁盘访问权限
-
-由于 macOS 的安全策略 (TCC)，系统通知数据库是受保护的。你需要授权终端访问它：
-
-1. 打开 **系统设置 > 隐私与安全 > 完全磁盘访问权限**
-2. 将运行此程序的终端（Terminal / iTerm2）或编译后的 `MacPush.app` 添加进去并开启权限
-
-### 3. 构建并安装 App
-
-```bash
 chmod +x build_dist.sh
 ./build_dist.sh
 cp -R MacPush.app /Applications/
 ```
 
-### 4. 配置推送渠道
+### 2. 授予完全磁盘访问权限
+
+由于 macOS 的安全策略 (TCC)，系统通知数据库是受保护的。你需要授权 App 访问它：
+
+1. 打开 **系统设置 > 隐私与安全 > 完全磁盘访问权限**
+2. 将 `MacPush.app` 添加进去并开启权限
+
+### 3. 配置推送渠道
 
 1. 从菜单栏点击 🔔 图标 → 选择「设置」
 2. 在弹出的 Web 配置面板中，启用并填写邮箱 SMTP 信息，或 Telegram Bot Token / Chat ID
 3. 点击「测试连接」验证配置
 4. 点击「保存全部配置」
 
-### 5. 启动服务
+### 4. 启动服务
 
 在菜单栏下拉菜单中，打开「启用转发服务」开关即可。
 
