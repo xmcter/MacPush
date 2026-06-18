@@ -27,6 +27,10 @@ venv/
 # Icon generation temp files
 app_icon.iconset/
 
+# DMG build temp files
+MacPush_rw.dmg
+dmg_staging/
+
 # IDE
 .vscode/
 .idea/
