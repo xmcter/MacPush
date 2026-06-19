@@ -62,6 +62,10 @@ cat > MacPush.app/Contents/Info.plist << 'EOF'
 </plist>
 EOF
 
+# Ad-hoc code sign (required for Gatekeeper, no Apple Developer certificate needed)
+echo "Code signing (ad-hoc)..."
+codesign --force --deep --sign - MacPush.app
+
 echo "=== Build completed successfully! ==="
 echo "The application bundle is at: ./MacPush.app"
 echo ""

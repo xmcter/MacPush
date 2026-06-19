@@ -56,7 +56,7 @@ def create_ds_store(output_path, staging_dir):
 
 
 if __name__ == "__main__":
-    project_dir = "/Users/a123/WorkBuddy/2026-06-18-22-17-26/MacPush"
+    project_dir = os.path.dirname(os.path.abspath(__file__))
     staging_dir = os.path.join(project_dir, "dmg_staging")
     output_path = os.path.join(staging_dir, ".DS_Store")
     create_ds_store(output_path, staging_dir)

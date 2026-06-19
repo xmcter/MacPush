@@ -107,11 +107,15 @@ MacPush/
 ├── config_helper.py          # 配置管理助手
 ├── web_config.py             # Web 配置面板 HTTP 服务器
 ├── build_dist.sh             # 构建脚本（编译并打包 .app）
+├── build_dmg.sh              # DMG 安装包构建脚本
 ├── create_icns.sh            # 图标生成脚本
+├── make_dmg_bg.py            # DMG 背景图生成脚本
+├── create_ds_store.py        # DMG .DS_Store 生成脚本
 ├── com.a123.macpush.forwarder.plist  # LaunchAgent 模板
 ├── config.example.json       # 配置文件示例
 ├── app_icon.icns             # 应用图标
 ├── app_icon_transparent.png  # 图标源文件
+├── dmg_background.png        # DMG 背景图
 └── web/
     ├── index.html            # 配置面板页面
     ├── style.css             # 配置面板样式
@@ -122,7 +126,7 @@ MacPush/
 
 1. **通知监测**：macOS 所有通知缓存在 SQLite 数据库中，路径为 `$(getconf DARWIN_USER_DIR)/com.apple.notificationcenter/db2/db`
 2. **数据解析**：数据库 `record` 表的 `data` 列是二进制属性列表 (bplist)，通过 Python `plistlib` 解析出标题、副标题、正文
-3. **防重机制**：处理完通知后，将最新 `rec_id` 写入 `~/.last_id`，重启时从该 ID 继续
+3. **防重机制**：处理完通知后，将最新 `rec_id` 写入 `~/Library/Application Support/MacPush/.last_id`，重启时从该 ID 继续
 4. **智能免打扰**：通过 `ioreg` 读取 HIDIdleTime，判断用户是否活跃
 5. **推送发送**：邮件使用 `smtplib` SSL 连接；Telegram 使用 `urllib.request` 调用 Bot API
 
@@ -269,11 +273,15 @@ MacPush/
 ├── config_helper.py          # Config management helper
 ├── web_config.py             # Web config panel HTTP server
 ├── build_dist.sh             # Build script (compiles and packages .app)
+├── build_dmg.sh              # DMG installer build script
 ├── create_icns.sh            # Icon generation script
+├── make_dmg_bg.py            # DMG background image generator
+├── create_ds_store.py        # DMG .DS_Store generator
 ├── com.a123.macpush.forwarder.plist  # LaunchAgent template
 ├── config.example.json       # Config file example
 ├── app_icon.icns             # App icon
 ├── app_icon_transparent.png  # Icon source file
+├── dmg_background.png        # DMG background image
 └── web/
     ├── index.html            # Config panel page
     ├── style.css             # Config panel styles
@@ -284,7 +292,7 @@ MacPush/
 
 1. **Notification Monitoring**: All macOS notifications are cached in a SQLite database at `$(getconf DARWIN_USER_DIR)/com.apple.notificationcenter/db2/db`
 2. **Data Parsing**: The `data` column in the database `record` table is a binary property list (bplist), parsed via Python `plistlib` to extract title, subtitle, and body
-3. **Deduplication**: After processing, the latest `rec_id` is written to `~/.last_id`; on restart, it resumes from that ID
+3. **Deduplication**: After processing, the latest `rec_id` is written to `~/Library/Application Support/MacPush/.last_id`; on restart, it resumes from that ID
 4. **Smart Do-Not-Disturb**: Reads HIDIdleTime via `ioreg` to determine if the user is active
 5. **Push Delivery**: Email uses `smtplib` SSL connection; Telegram uses `urllib.request` to call the Bot API
 

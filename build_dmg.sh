@@ -1,7 +1,8 @@
 #!/bin/bash
 set -e
 
-PROJECT_DIR="/Users/a123/WorkBuddy/2026-06-18-22-17-26/MacPush"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+PROJECT_DIR="$SCRIPT_DIR"
 STAGE="${PROJECT_DIR}/dmg_staging"
 FINAL_DMG="${PROJECT_DIR}/MacPush.dmg"
 

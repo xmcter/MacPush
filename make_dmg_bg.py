@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Generate DMG background image with bilingual (CN/EN) drag instructions."""
 
+import os
 from PIL import Image, ImageDraw, ImageFont
 
 W, H = 660, 400
@@ -152,8 +153,9 @@ def main():
     draw.text(((W - w_hcn) / 2, y_hint), hint_cn, fill=HINT_COLOR, font=font_cn_small)
     draw.text(((W - w_hen) / 2, y_hint + 20), hint_en, fill=HINT_COLOR, font=font_en_small)
 
-    img.save("/Users/a123/WorkBuddy/2026-06-18-22-17-26/MacPush/dmg_background.png", "PNG")
-    print("Saved dmg_background.png (660x400, bilingual)")
+    output_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "dmg_background.png")
+    img.save(output_path, "PNG")
+    print(f"Saved {output_path} (660x400, bilingual)")
 
 
 if __name__ == "__main__":
