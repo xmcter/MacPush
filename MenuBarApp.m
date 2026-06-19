@@ -253,8 +253,9 @@ static NSString *kWebConfigScript = nil;
 }
 
 - (void)editConfig {
-    // Start local config web server asynchronously in background if it's dead, avoiding pipe inheritance deadlocks
-    NSString *cmd = [NSString stringWithFormat:@"pgrep -f '[w]eb_config.py' || python3 '%@' >/dev/null 2>&1 &", kWebConfigScript];
+    // Start local config web server asynchronously in background if it's dead.
+    // Use the full script path in pgrep to avoid matching other apps' web_config.py
+    NSString *cmd = [NSString stringWithFormat:@"pgrep -f '%@' || python3 '%@' >/dev/null 2>&1 &", kWebConfigScript, kWebConfigScript];
     [self runShellAsync:cmd];
 
     // Create native Window in app controller if not yet built
